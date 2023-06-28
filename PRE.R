@@ -1,3 +1,5 @@
+# Intellectual property of Pr. Dominique Muller; UGA LIP/PC2S, Grenoble, France
+
 PRE <- function(model) {
   library(car)
   A <- Anova(model, type = 3)
