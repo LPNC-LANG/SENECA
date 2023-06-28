@@ -1,3 +1,6 @@
+# Intellectual property of Pr. Dominique Muller; UGA LIP/PC2S, Grenoble, France
+
+
 # Description:
 # Save Studentized deleted residuals, Cook D's and lever within a dataframe that
 # contains the variables implied in the regression model.
