@@ -1,0 +1,10 @@
+name: seneca
+title:
+username: lpnc-lang
+account: lpnc-lang
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8817694
+bundleId: 8249811
+url: https://lpnc-lang.shinyapps.io/seneca/
+version: 1

@@ -1,0 +1,30 @@
+;hemi;region;side;label;;RSNET
+1;right;NA;coronal;NA;;
+2;left;NA;coronal;NA;;
+3;left;thalamus proper;coronal;Left-Thalamus-Proper;;3
+4;right;thalamus proper;coronal;Right-Thalamus-Proper;;3
+5;right;lateral ventricle;coronal;Right-Lateral-Ventricle;;
+6;left;hippocampus;coronal;Left-Hippocampus;;
+7;left;lateral ventricle;coronal;Left-Lateral-Ventricle;;
+8;right;putamen;coronal;Right-Putamen;;
+9;right;amygdala;coronal;Right-Amygdala;;
+10;left;putamen;coronal;Left-Putamen;;
+11;right;ventral DC;coronal;Right-VentralDC;;
+12;left;ventral DC;coronal;Left-VentralDC;;
+13;right;hippocampus;coronal;Right-Hippocampus;;
+14;left;amygdala;coronal;Left-Amygdala;;
+15;left;pallidum;coronal;Left-Pallidum;;
+16;right;pallidum;coronal;Right-Pallidum;;
+17;left;caudate;coronal;Left-Caudate;;
+18;right;caudate;coronal;Right-Caudate;;
+19;midline;3rd ventricle;sagittal;x3rd-ventricle;;
+20;midline;4th ventricle;sagittal;x4th-ventricle;;
+21;midline;brain stem;sagittal;Brain-Stem;;
+22;midline;CC anterior;sagittal;CC_Anterior;;
+23;midline;CC central;sagittal;CC_Central;;
+24;midline;CC mid anterior;sagittal;CC_Mid_Anterior;;
+25;midline;CC mid posterior;sagittal;CC_Mid_Posterior;;
+26;midline;CC posterior;sagittal;CC_Posterior;;
+27;midline;cerebellum cortex;sagittal;Right-Cerebellum-Cortex;;1
+28;midline;cerebellum white matter;sagittal;Right-Cerebellum-White-Matter;;
+29;midline;NA;sagittal;NA;;
