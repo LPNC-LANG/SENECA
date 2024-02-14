@@ -30,11 +30,11 @@ efficiencies_ROI <- data_functional_role %>%
 
 
 TFP_Subject_overview <- cbind(TFP_Subject_overview,
-                              mean_FC = covariate_FC$mean_FC,
-                              TIV = as.numeric(participants$tiv_cubicmm),
-                              Eglob = efficiencies_ROI$Eglob,
-                              Eloc = efficiencies_ROI$Eloc,
-                              Disruption = efficiencies_ROI$Disruption
+  mean_FC = covariate_FC$mean_FC,
+  TIV = as.numeric(participants$tiv_cubicmm),
+  Eglob = efficiencies_ROI$Eglob,
+  Eloc = efficiencies_ROI$Eloc,
+  Disruption = efficiencies_ROI$Disruption
 )
 
 TFP_Subject_subsystem <- merge(TFP_Subject_subsystem, TFP_Subject_overview %>% dplyr::select(Subj_ID, Gender_c, mean_FC, TIV), by = "Subj_ID")
@@ -50,12 +50,12 @@ list_imputed <- list()
 for (i in 1:length(list_TFP_Subject_subsystem)) {
   library(zCompositions)
   library(compositions)
-  
+
   tmp_raw <- rbindlist(list_TFP_Subject_subsystem[i]) %>% arrange(Subj_ID)
-  
+
   tmp_coda_modular <- tmp_raw %>%
     dplyr::select(Connector, Satellite, Provincial, Peripheral)
-  
+
   if (min(tmp_coda_modular) == 0) {
     tmp_coda_modular_bis <- tmp_coda_modular %>%
       acomp(.) %>%
@@ -63,18 +63,18 @@ for (i in 1:length(list_TFP_Subject_subsystem)) {
   } else {
     tmp_coda_modular_bis <- tmp_coda_modular
   }
-  
+
   tmp <- cbind(
     tmp_raw %>% dplyr::select(-c(Connector, Satellite, Provincial, Peripheral)),
     tmp_coda_modular_bis
   )
-  
+
   list_imputed[[i]] <- tmp
 }
 
 TFP_Subject_subsystem_imputed <- rbindlist(list_imputed)
 TFP_Subject_subsystem_imputed$`RS-LANG` <- factor(TFP_Subject_subsystem_imputed$`RS-LANG`,
-                                                  ordered = FALSE
+  ordered = FALSE
 )
 
 subsystem_level_stats <- TFP_Subject_subsystem_imputed %>%
@@ -89,26 +89,26 @@ subsystem_level_stats <- TFP_Subject_subsystem_imputed %>%
 # GAM MODELS ---
 # Connector
 gam1_interaction <- mgcv::gam(Connector_balance ~ s(Age, `RS-LANG`, bs = "fs") + mean_FC + Gender_c + TIV,
-                              data = subsystem_level_stats,
-                              method = "ML"
+  data = subsystem_level_stats,
+  method = "ML"
 )
 summary(gam1_interaction)
 
 gam1_interaction_1 <- mgcv::gam(Connector_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
+  method = "REML"
 )
 gam1_interaction_2 <- mgcv::gam(Connector_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
+  method = "REML"
 )
 gam1_interaction_3 <- mgcv::gam(Connector_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
+  method = "REML"
 )
 gam1_interaction_4 <- mgcv::gam(Connector_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
+  method = "REML"
 )
 
 summary(gam1_interaction_1)
@@ -124,26 +124,26 @@ p.adjust(c(0.0222, 0.0479, 0.0796, 0.115), method = "fdr")
 
 # Provincial
 gam2_interaction <- mgcv::gam(Provincial_balance ~ s(Age, `RS-LANG`, bs = "fs") + mean_FC + Gender_c + TIV,
-                              data = subsystem_level_stats,
-                              method = "ML"
+  data = subsystem_level_stats,
+  method = "ML"
 )
 summary(gam2_interaction)
 
 gam2_interaction_1 <- mgcv::gam(Provincial_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
+  method = "REML"
 )
 gam2_interaction_2 <- mgcv::gam(Provincial_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
+  method = "REML"
 )
 gam2_interaction_3 <- mgcv::gam(Provincial_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
+  method = "REML"
 )
 gam2_interaction_4 <- mgcv::gam(Provincial_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
+  method = "REML"
 )
 
 summary(gam2_interaction_1)
@@ -159,26 +159,26 @@ p.adjust(c(0.0222, 0.0479, 0.0796, 0.115), method = "fdr")
 
 # Peripheral
 gam3_interaction <- mgcv::gam(Peripheral_balance ~ s(Age, `RS-LANG`, bs = "fs") + mean_FC + Gender_c + TIV,
-                              data = subsystem_level_stats,
-                              method = "ML"
+  data = subsystem_level_stats,
+  method = "ML"
 )
 summary(gam3_interaction)
 
 gam3_interaction_1 <- mgcv::gam(Peripheral_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
+  method = "REML"
 )
 gam3_interaction_2 <- mgcv::gam(Peripheral_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
+  method = "REML"
 )
 gam3_interaction_3 <- mgcv::gam(Peripheral_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
+  method = "REML"
 )
 gam3_interaction_4 <- mgcv::gam(Peripheral_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
+  method = "REML"
 )
 
 summary(gam3_interaction_1)
@@ -195,26 +195,26 @@ p.adjust(c(0.0222, 0.0479, 0.0796, 0.115), method = "fdr")
 # Satellite
 
 gam4_interaction <- mgcv::gam(Satellite_balance ~ s(Age, `RS-LANG`, bs = "fs") + mean_FC + Gender_c + TIV,
-                              data = subsystem_level_stats,
-                              method = "ML"
+  data = subsystem_level_stats,
+  method = "ML"
 )
 summary(gam4_interaction)
 
 gam4_interaction_1 <- mgcv::gam(Satellite_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 1 (DMN, FPN, Language)"),
+  method = "REML"
 )
 gam4_interaction_2 <- mgcv::gam(Satellite_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 2 (SMN)"),
+  method = "REML"
 )
 gam4_interaction_3 <- mgcv::gam(Satellite_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 3 (CON, FPN, Language)"),
+  method = "REML"
 )
 gam4_interaction_4 <- mgcv::gam(Satellite_balance ~ s(Age, k = 3) + mean_FC + Gender_c + TIV,
-                                data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
-                                method = "REML"
+  data = subsystem_level_stats %>% filter(`RS-LANG` == "RS-NET 4 (FPN)"),
+  method = "REML"
 )
 
 summary(gam4_interaction_1)

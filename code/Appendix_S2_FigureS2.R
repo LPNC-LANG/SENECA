@@ -1,6 +1,6 @@
 ################################################################################
 # Written by Clément Guichet, PhD Student
-# LPNC - CNRS UMR 5105 
+# LPNC - CNRS UMR 5105
 # 2024
 
 
@@ -38,7 +38,8 @@ custom_palette <- c(
 rs_irmf_LANG <- (data_full_per_region %>% subset(threshold == "0.15"))$`Consensus_vector_0.15`
 
 task_irmf_LANG <- read_excel("LANG_atlas_RSN_overlap/raw_data.xlsx",
-                                     sheet = 1)$task_irmf_LANG
+  sheet = 1
+)$task_irmf_LANG
 
 # NMI & AMI
 NMI_func(factor(task_irmf_LANG), factor(rs_irmf_LANG))
@@ -105,12 +106,12 @@ alluvial_community <- ggplot(
   geom_text(stat = "stratum", label = display_percentage, nudge_y = -5, size = 7) +
   geom_text(stat = "stratum", label = display_communities, size = 7) +
   scale_fill_brewer(palette = "Oranges", direction = 1) +
-  theme(axis.line.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.x = element_blank()
-        ) +
+  theme(
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  ) +
   ggpubr::theme_pubclean()
 
 alluvial_community
-

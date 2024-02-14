@@ -1,6 +1,6 @@
 ################################################################################
 # Written by Clément Guichet, PhD Student
-# LPNC - CNRS UMR 5105 
+# LPNC - CNRS UMR 5105
 # 2024
 
 ################################################################################
@@ -30,7 +30,7 @@ CAMCAN_cognitive_data <- read_excel("./data/cognitive_data_628/CognitiveData_Cam
   )) %>%
   dplyr::rename(Proverb = Proverbs_Summary__Score) %>%
   dplyr::rename(Naming = Picture__Primming_Summary_ACC_baseline_all) %>%
-  dplyr::rename(ToT_Ratio = TOT_Summary_ToT_ratio) 
+  dplyr::rename(ToT_Ratio = TOT_Summary_ToT_ratio)
 
 
 
@@ -54,38 +54,48 @@ CAMCAN_cognitive_data_supp <- read_excel("./data/cognitive_data_628/CognitiveDat
 # IMPUTE MEDIAN VALUE TO DATA ----
 ################################################################################
 
-exclusion <- CAMCAN_cognitive_data %>% 
-  mutate(E1 = ifelse(is.na(Cattell), 1, 0),
-         E2 = ifelse(is.na(Proverb), 1, 0),
-         E3 = ifelse(is.na(Naming), 1, 0),
-         E4 = ifelse(is.na(ToT_Ratio), 1, 0),
-         E_tot = E1 + E2 + E3 + E4) %>% 
+exclusion <- CAMCAN_cognitive_data %>%
+  mutate(
+    E1 = ifelse(is.na(Cattell), 1, 0),
+    E2 = ifelse(is.na(Proverb), 1, 0),
+    E3 = ifelse(is.na(Naming), 1, 0),
+    E4 = ifelse(is.na(ToT_Ratio), 1, 0),
+    E_tot = E1 + E2 + E3 + E4
+  ) %>%
   # Exclude participants if 3 or more missing values (628 to 613 participants as a result)
-  filter(E_tot < 3) %>% arrange(Age_CogData) %>% 
-  mutate(Age_CogData = as.numeric(Age_CogData),
-    Age_decade = ifelse(Age_CogData <= 30, 25, 
-                             ifelse(Age_CogData <= 40, 35,
-                                    ifelse(Age_CogData <= 50, 45,
-                                           ifelse(Age_CogData <= 60, 55,
-                                                  ifelse(Age_CogData <= 70, 65,
-                                                         ifelse(Age_CogData <= 80, 75, 85))))))) %>% 
-  group_by(Age_decade, .all = TRUE) %>% 
+  filter(E_tot < 3) %>%
+  arrange(Age_CogData) %>%
+  mutate(
+    Age_CogData = as.numeric(Age_CogData),
+    Age_decade = ifelse(Age_CogData <= 30, 25,
+      ifelse(Age_CogData <= 40, 35,
+        ifelse(Age_CogData <= 50, 45,
+          ifelse(Age_CogData <= 60, 55,
+            ifelse(Age_CogData <= 70, 65,
+              ifelse(Age_CogData <= 80, 75, 85)
+            )
+          )
+        )
+      )
+    )
+  ) %>%
+  group_by(Age_decade, .all = TRUE) %>%
   group_split()
 
 exclusion_list <- list()
 for (i in 1:length(exclusion)) {
   tmp <- rbindlist(lapply(exclusion[i], as.data.table)) %>% as.data.frame()
-  tmp_select <- tmp[,3:6]
+  tmp_select <- tmp[, 3:6]
   # getting median of each column using apply()
-  all_column_median <- apply(tmp_select, 2, median, na.rm=TRUE)
-  
+  all_column_median <- apply(tmp_select, 2, median, na.rm = TRUE)
+
   # imputing median value with NA
-  for(j in colnames(tmp_select)) {
-    tmp_select[,j][is.na(tmp_select[,j])] <- all_column_median[j]
+  for (j in colnames(tmp_select)) {
+    tmp_select[, j][is.na(tmp_select[, j])] <- all_column_median[j]
   }
-  
-  tmp_imputed <- cbind(Observations = tmp[,1], tmp_select)
-  
+
+  tmp_imputed <- cbind(Observations = tmp[, 1], tmp_select)
+
   exclusion_list[[i]] <- tmp_imputed
 }
 
@@ -96,7 +106,7 @@ CAMCAN_cognitive_data_imputed_median <- rbindlist(exclusion_list)
 ################################################################################
 
 Data_CCA <- merge(participants, CAMCAN_cognitive_data_imputed_median, by = "Observations") %>%
-  merge(., CAMCAN_cognitive_data_supp, by = "Observations") %>% 
+  merge(., CAMCAN_cognitive_data_supp, by = "Observations") %>%
   merge(., subsystem_level_stats %>% dplyr::select(
     Subj_ID, Age, `RS-LANG`,
     Connector_balance, Provincial_balance, Peripheral_balance, Satellite_balance
@@ -104,38 +114,41 @@ Data_CCA <- merge(participants, CAMCAN_cognitive_data_imputed_median, by = "Obse
 
 Data_CCA_full <- Data_CCA %>%
   na.omit() %>%
-  mutate(ToT_Ratio_inverse = 1-ToT_Ratio) %>%
-  mutate(Hotel_Task_inverse = 1-log(Hotel_Task)) %>%
+  mutate(ToT_Ratio_inverse = 1 - ToT_Ratio) %>%
+  mutate(Hotel_Task_inverse = 1 - log(Hotel_Task)) %>%
   dplyr::select(-c(ToT_Ratio, Hotel_Task)) %>%
   pivot_longer(c(Connector_balance, Provincial_balance, Peripheral_balance, Satellite_balance),
     names_to = "topological_balances", values_to = "value"
   ) %>%
-  unite(BalancexRSN, "RS-LANG", "topological_balances", remove = FALSE) %>% 
-  dplyr::select(-c(topological_balances, `RS-LANG`)) %>% 
+  unite(BalancexRSN, "RS-LANG", "topological_balances", remove = FALSE) %>%
+  dplyr::select(-c(topological_balances, `RS-LANG`)) %>%
   spread(BalancexRSN, value)
 
 
 # Setup datasets for CCA ----
 age_contrasts <- Data_CCA_full %>% mutate(
-  age_groups = ifelse(Age < 45, 'young', 
-                          ifelse(Age <=55 & Age >= 45, 'middle',
-                                 'old')),
-  c1 = ifelse(age_groups == "old", 1, -1/2),
-  c2 = ifelse(age_groups == "young", -1/2, 
-              ifelse(age_groups == "middle", 1/2, 0))
+  age_groups = ifelse(Age < 45, "young",
+    ifelse(Age <= 55 & Age >= 45, "middle",
+      "old"
+    )
+  ),
+  c1 = ifelse(age_groups == "old", 1, -1 / 2),
+  c2 = ifelse(age_groups == "young", -1 / 2,
+    ifelse(age_groups == "middle", 1 / 2, 0)
   )
+)
 
 cog_set <- Data_CCA_full[, c(3:8, 10:11)] %>%
-  scale(.) %>% 
+  scale(.) %>%
   # contrasts
   cbind(c1 = as.numeric(age_contrasts$c1), c2 = as.numeric(age_contrasts$c2)) %>%
-  as.data.frame() 
+  as.data.frame()
 
 brain_set <- Data_CCA_full[, c(
   12:27
 )] %>%
-  scale(.) %>% 
-  as.data.frame() 
+  scale(.) %>%
+  as.data.frame()
 
 ################################################################################
 # CANONICAL CORRELATION  ANALYSIS ----
@@ -159,15 +172,15 @@ cc_results$cor[2]^2
 cc_results[3:4]
 
 # VIF
-1/(1-(cc_results[3:4]$xcoef[,1]^2))
-1/(1-(cc_results[3:4]$ycoef[,1]^2))
+1 / (1 - (cc_results[3:4]$xcoef[, 1]^2))
+1 / (1 - (cc_results[3:4]$ycoef[, 1]^2))
 
 
 # Identical because sigma = 1, already scaled beforehand
 # Std function coefficients
 # s1 <- diag(sqrt(diag(cov(brain_set))))
 # s1 %*% cc_results$xcoef
-# 
+#
 # s1 <- diag(sqrt(diag(cov(cog_set))))
 # s1 %*% cc_results$ycoef
 
@@ -180,8 +193,8 @@ cc_loadings[3:6]$corr.X.xscores
 cc_loadings[3:6]$corr.Y.yscores
 
 # multicollinearity
-sum((cc_loadings[3:6]$corr.X.xscores^2)[,1])
-sum((cc_loadings[3:6]$corr.Y.yscores^2)[,1])
+sum((cc_loadings[3:6]$corr.X.xscores^2)[, 1])
+sum((cc_loadings[3:6]$corr.Y.yscores^2)[, 1])
 
 
 # tests of canonical dimensions

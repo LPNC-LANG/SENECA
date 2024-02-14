@@ -101,7 +101,7 @@ Proportion <- data_functional_role %>%
   group_by(Subj_ID, Metric_name) %>%
   group_split() %>%
   map_dfr(. %>% slice_max(Metric_value, n = 131 * 1) %>% # 131 is the number of regions in the LANG connectome
-            mutate(rank = rep(seq(1:length(Region))))) %>%
+    mutate(rank = rep(seq(1:length(Region))))) %>%
   group_by(Subj_ID) %>%
   group_split()
 
@@ -117,10 +117,10 @@ for (i in 1:length(Proportion)) {
     filter(Region %in% Hub_df$Region) %>%
     filter(Subj_ID == i) %>%
     dplyr::select(Subj_ID, Age, Region, `1st_network`, `RS-LANG`, MODULAR)
-  
+
   # Hub region of each subject
   list_1[[i]] <- tmp
-  
+
   # Here I compute the proportion of each role
   tmp_bis <- tmp %>%
     group_by(MODULAR) %>%
@@ -128,8 +128,8 @@ for (i in 1:length(Proportion)) {
     mutate(freq = n / sum(n)) %>%
     dplyr::select(-n) %>%
     spread(MODULAR, freq)
-  
-  
+
+
   # Topologico-functional profiles
   list_2[[i]] <- tmp_bis
 }
@@ -164,11 +164,11 @@ TFP_Subject_subsystem <- TFP_Subject_detailed %>%
   spread(Functional_role, freq) %>%
   mutate_at(vars(Connector:Peripheral), funs(as.numeric(. * 100))) %>%
   mutate(`RS-LANG` = ifelse(`RS-LANG` == "1", "RS-NET 1 (DMN, FPN, Language)",
-                            ifelse(`RS-LANG` == "3", "RS-NET 3 (CON, FPN, Language)",
-                                   ifelse(`RS-LANG` == "2", "RS-NET 2 (SMN)",
-                                          ifelse(`RS-LANG` == "4", "RS-NET 4 (FPN)",
-                                                 "RS-NET 5 (VMM)"
-                                          )
-                                   )
-                            )
+    ifelse(`RS-LANG` == "3", "RS-NET 3 (CON, FPN, Language)",
+      ifelse(`RS-LANG` == "2", "RS-NET 2 (SMN)",
+        ifelse(`RS-LANG` == "4", "RS-NET 4 (FPN)",
+          "RS-NET 5 (VMM)"
+        )
+      )
+    )
   ))

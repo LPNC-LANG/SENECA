@@ -1,6 +1,6 @@
 ##########################################################################################
 # Written by Clément Guichet, PhD Student
-# LPNC - CNRS UMR 5105 
+# LPNC - CNRS UMR 5105
 # 2023
 
 ##########################################################################################
@@ -18,35 +18,37 @@ data_full_per_subject_LLC <- merge(data_full_per_subject, LLC_threshold, by = "t
 
 # Evolution of Global metrics - what is the optimal threshold?
 evo <- data_full_per_subject_LLC %>%
-  group_by(threshold) %>% 
+  group_by(threshold) %>%
   summarise_at(vars(Eglob, Clustering_coeff_glob, Eloc, `Largest Connected Component`), funs(mean)) %>%
-  dplyr::rename(ClustCoeff = Clustering_coeff_glob, 
-                LLC = `Largest Connected Component`) %>% 
+  dplyr::rename(
+    ClustCoeff = Clustering_coeff_glob,
+    LLC = `Largest Connected Component`
+  ) %>%
   pivot_longer(
     cols = !c("threshold"),
     names_to = "Metrics"
   )
 
-evo %>% 
-    ggplot(aes(threshold, value, color = Metrics)) +
-    geom_line(size = 1) +
-    geom_point(size = 4) +
-    geom_jitter(height = 0.05, alpha = 0) +
-    xlab("Threshold level") +
-    ylab("") +
-    scale_x_continuous(breaks = c(0.1, 0.12, 0.15, 0.17, 0.2)) +
-    scale_y_continuous(breaks = seq(0, 1, 0.1)) +
-    coord_cartesian(ylim = c(0.4, 1)) +
-    # geom_rect(
-    #   aes(
-    #     xmin = 0.14,
-    #     xmax = 0.16,
-    #     ymin = 0.25,
-    #     ymax = 1.01
-    #   ),
-    #   fill = "red", alpha = 0.2, color = "red", linewidth = 0.1
-    # ) +
-    ggpubr::theme_pubclean(base_size = 18, base_family = 'sans')
+evo %>%
+  ggplot(aes(threshold, value, color = Metrics)) +
+  geom_line(size = 1) +
+  geom_point(size = 4) +
+  geom_jitter(height = 0.05, alpha = 0) +
+  xlab("Threshold level") +
+  ylab("") +
+  scale_x_continuous(breaks = c(0.1, 0.12, 0.15, 0.17, 0.2)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1)) +
+  coord_cartesian(ylim = c(0.4, 1)) +
+  # geom_rect(
+  #   aes(
+  #     xmin = 0.14,
+  #     xmax = 0.16,
+  #     ymin = 0.25,
+  #     ymax = 1.01
+  #   ),
+  #   fill = "red", alpha = 0.2, color = "red", linewidth = 0.1
+  # ) +
+  ggpubr::theme_pubclean(base_size = 18, base_family = "sans")
 
 
 

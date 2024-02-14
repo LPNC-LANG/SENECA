@@ -1,6 +1,6 @@
 ################################################################################
 # Written by Clément Guichet, PhD Student
-# LPNC - CNRS UMR 5105 
+# LPNC - CNRS UMR 5105
 # 2024
 
 ##########################################################################################
@@ -56,18 +56,19 @@ Weighted_RSN_vector_RS_our_method <- data_full_per_region %>%
   summarise_at(vars(certainty_factor), mean)
 
 Net_proportion_RS_weighted <- merge(Net_proportion_RS_our_method,
-                                    Weighted_RSN_vector_RS_our_method,
-                                    by = c("Consensus_vector_0.15", "1st_network")
+  Weighted_RSN_vector_RS_our_method,
+  by = c("Consensus_vector_0.15", "1st_network")
 ) %>%
   group_by(Consensus_vector_0.15) %>%
   mutate(n_adjusted = n * certainty_factor) %>%
-  mutate(adjusted_freq = n_adjusted / sum(n_adjusted)) %>% 
-  mutate(total_adjustment = abs(1 - (adjusted_freq / freq))) %>% 
+  mutate(adjusted_freq = n_adjusted / sum(n_adjusted)) %>%
+  mutate(total_adjustment = abs(1 - (adjusted_freq / freq))) %>%
   arrange(Consensus_vector_0.15, desc(adjusted_freq))
 
 
-mean_adjustment <- Net_proportion_RS_weighted %>% group_by(Consensus_vector_0.15) %>% 
-  slice_max(freq, n = 3) %>% 
+mean_adjustment <- Net_proportion_RS_weighted %>%
+  group_by(Consensus_vector_0.15) %>%
+  slice_max(freq, n = 3) %>%
   arrange(Consensus_vector_0.15, desc(adjusted_freq))
 
 mean(mean_adjustment$total_adjustment)
@@ -131,22 +132,25 @@ composition <- ggplot(Net_proportion_RS_weighted, aes(
   theme_pubr(legend = "none")
 
 
-composition + theme_pubr(base_size = 18, base_family = "sans",
-                legend = "right")
+composition + theme_pubr(
+  base_size = 18, base_family = "sans",
+  legend = "right"
+)
 
 
 # Radar plot of RSN per Community
 Net_proportion_RS_weighted$`1st_network` <- factor(Net_proportion_RS_weighted$`1st_network`,
-                                                   levels = c(
-                                                     "DMN", "Language", "CON",
-                                                     "FPN", "DAN",
-                                                     "Visual 1", "Visual 2",
-                                                     "SMN", "PMM",
-                                                     "VMM"
-                                                   ))
+  levels = c(
+    "DMN", "Language", "CON",
+    "FPN", "DAN",
+    "Visual 1", "Visual 2",
+    "SMN", "PMM",
+    "VMM"
+  )
+)
 
 Radar_RSN_community <- Net_proportion_RS_weighted %>%
-  subset(adjusted_freq >= .20) %>% 
+  subset(adjusted_freq >= .20) %>%
   filter(`1st_network` != "VMM") %>%
   dplyr::select(`1st_network`, adjusted_freq) %>%
   spread(`1st_network`, adjusted_freq) %>%
@@ -156,9 +160,9 @@ Radar_RSN_community <- Net_proportion_RS_weighted %>%
 
 
 radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
-                      alpha = 1, label_size = 3,
-                      title = NULL,
-                      palette = c("#D7301F", "#FC8D59", "#08519C", "#FDCC8A")
+  alpha = 1, label_size = 3,
+  title = NULL,
+  palette = c("#D7301F", "#FC8D59", "#08519C", "#FDCC8A")
 )
 
 
@@ -168,7 +172,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 # # Random threshold to keep 131 ROIs
 # data_InLang <- data_full_per_region
 # # %>% subset(threshold == "0.15")
-# 
+#
 # # With InLang method for network assignment
 # Net_proportion_InLang <- data_InLang %>%
 #   # Remove non-assigned LANG regions - remaining 117 ROIs
@@ -177,7 +181,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   summarise(n = n()) %>%
 #   mutate(freq = n / sum(n)) %>%
 #   arrange(LANG_Net_assign, desc(freq))
-# 
+#
 # # With ImCalc method
 # Net_proportion_ImCalc <- data_InLang %>%
 #   mutate_at(vars(ends_with("value")), funs(as.numeric(as.character(.)))) %>%
@@ -185,7 +189,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   summarise(n = n()) %>%
 #   mutate(freq = n / sum(n)) %>%
 #   arrange(LANG_Net_assign, desc(n))
-# 
+#
 # Weighted_RSN_vector <- data_InLang %>%
 #   mutate_at(vars(ends_with("value")), funs(as.numeric(as.character(.)))) %>%
 #   # 1 = High certainty, 0 = Low certainty
@@ -193,7 +197,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   group_by(LANG_Net_assign, `1st_network`) %>%
 #   # Mean proportion by RSNs when a ROI is assigned with that RSN
 #   summarise_at(vars(certainty_factor), mean)
-# 
+#
 # Net_proportion_ImCalc_weighted <- merge(Net_proportion_ImCalc,
 #   Weighted_RSN_vector,
 #   by = c("LANG_Net_assign", "1st_network")
@@ -206,7 +210,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   mutate(adjusted_freq = n_adjusted / sum(n_adjusted)) %>%
 #   #
 #   arrange(LANG_Net_assign, desc(adjusted_freq))
-# 
+#
 # # Network assignment on the 131 LANG ROIs according to our ImCalc method
 # p <- ggplot(Net_proportion_InLang, aes(
 #   # the group argument allows to stack according to the increasing values instead of the labels
@@ -235,7 +239,7 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   coord_flip() +
 #   scale_fill_manual(values = custom_palette) +
 #   theme_pubr(legend = "none")
-# 
+#
 # p2 <- ggplot(Net_proportion_ImCalc_weighted, aes(
 #   # the group argument allows to stack according to the increasing values instead of the labels
 #   x = forcats::fct_rev(LANG_Net_assign), y = adjusted_freq, group = factor(adjusted_freq), fill = `1st_network`
@@ -263,10 +267,10 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   coord_flip() +
 #   scale_fill_manual(values = custom_palette) +
 #   theme_pubr(legend = "none")
-# 
+#
 # # Compare outputs
 # gridExtra::grid.arrange(p, p2)
-# 
+#
 # # Radar plot of RSN per LANG Nets
 # Radar_RSN_LANG_Nets <- Net_proportion_InLang %>%
 #   dplyr::select(LANG_Net_assign, CAB_NP_assign, freq) %>%
@@ -274,28 +278,28 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   remove_rownames() %>%
 #   column_to_rownames(var = "LANG_Net_assign") %>%
 #   mutate_at(vars(everything()), funs(. * 100))
-# 
-# 
+#
+#
 # radarplotting_overlap(Radar_RSN_LANG_Nets, 100, 0, 1, 1,
 #   alpha = 0.4, label_size = 1,
 #   title = "Composition of each LANG Net (InLang)",
 #   palette = c("#00AFBB", "#E7B800", "#FC4E07", "#FF99FF")
 # )
-# 
+#
 # legend(
 #   x = "bottomleft", legend = rownames(Radar_RSN_LANG_Nets), horiz = TRUE,
 #   bty = "n", pch = 20, col = c("#00AFBB", "#E7B800", "#FC4E07", "#FF99FF"),
 #   text.col = "black", cex = 1, pt.cex = 2
 # )
-# 
+#
 # Radar_RSN_LANG_Nets <- Net_proportion_ImCalc_weighted %>%
 #   dplyr::select(LANG_Net_assign, `1st_network`, adjusted_freq) %>%
 #   spread(`1st_network`, adjusted_freq) %>%
 #   remove_rownames() %>%
 #   column_to_rownames(var = "LANG_Net_assign") %>%
 #   mutate_at(vars(everything()), funs(. * 100))
-# 
-# 
+#
+#
 # radarplotting_overlap(Radar_RSN_LANG_Nets, 100, 0, 1, 1,
 #   alpha = 0.4, label_size = 1,
 #   title = "Composition of each LANG Net (Network_overlap_calc)",
@@ -306,4 +310,4 @@ radarplotting_overlap(Radar_RSN_community, 80, 0, 1, 1,
 #   bty = "n", pch = 20, col = c("#00AFBB", "#E7B800", "#FC4E07", "#FF99FF"),
 #   text.col = "black", cex = 1, pt.cex = 2
 # )
-# 
+#
